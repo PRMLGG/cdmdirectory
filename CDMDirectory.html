@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Cooldown Manager Dashboard</title>
+    <style>
+        :root {
+            --dk: #C41E3A; --dh: #A330C9; --druid: #FF7D0A; --evoker: #33937F;
+            --hunter: #ABD473; --mage: #3FC7EB; --monk: #00FF98; --paladin: #F48CBA;
+            --priest: #FFFFFF; --rogue: #FFF468; --shaman: #0070DE; --warlock: #8787ED;
+            --warrior: #C69B6D; --gold: #ffcc00; --bg: #121212; --card: #1e1e1e;
+        }
+
+        body {
+            background-color: var(--bg); color: #e0e0e0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 20px; margin: 0;
+        }
+
+        h1 { color: var(--gold); text-shadow: 2px 2px #000; margin-bottom: 5px; }
+        .subtitle { margin-bottom: 30px; color: #888; font-size: 0.9rem; }
+
+        .class-group { width: 100%; max-width: 1300px; margin-bottom: 35px; }
+        .class-header { 
+            font-size: 1.4rem; font-weight: bold; border-bottom: 2px solid #333; 
+            padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px;
+        }
+
+        .container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+            gap: 15px; 
+        }
+
+        .card {
+            background: var(--card); border: 1px solid #333; border-radius: 8px;
+            padding: 15px; text-align: center; transition: transform 0.2s;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .card:hover { transform: translateY(-3px); background: #252525; }
+        .spec-name { font-size: 1rem; font-weight: bold; margin-bottom: 12px; color: #fff; }
+
+        .copy-btn {
+            background-color: #333; border: 1px solid #444; color: white;
+            padding: 8px; font-weight: bold; border-radius: 4px; cursor: pointer;
+        }
+        .copy-btn:active { transform: scale(0.95); }
+
+        /* Class Styling */
+        .dk-c { border-top: 3px solid var(--dk); } .dk-c .copy-btn:hover { background: var(--dk); }
+        .dh-c { border-top: 3px solid var(--dh); } .dh-c .copy-btn:hover { background: var(--dh); }
+        .druid-c { border-top: 3px solid var(--druid); } .druid-c .copy-btn:hover { background: var(--druid); }
+        .evoker-c { border-top: 3px solid var(--evoker); } .evoker-c .copy-btn:hover { background: var(--evoker); }
+        .hunter-c { border-top: 3px solid var(--hunter); } .hunter-c .copy-btn:hover { background: var(--hunter); color:#000; }
+        .mage-c { border-top: 3px solid var(--mage); } .mage-c .copy-btn:hover { background: var(--mage); color:#000; }
+        .monk-c { border-top: 3px solid var(--monk); } .monk-c .copy-btn:hover { background: var(--monk); color:#000; }
+        .paladin-c { border-top: 3px solid var(--paladin); } .paladin-c .copy-btn:hover { background: var(--paladin); color:#000; }
+        .priest-c { border-top: 3px solid var(--priest); } .priest-c .copy-btn:hover { background: var(--priest); color:#000; }
+        .rogue-c { border-top: 3px solid var(--rogue); } .rogue-c .copy-btn:hover { background: var(--rogue); color:#000; }
+        .shaman-c { border-top: 3px solid var(--shaman); } .shaman-c .copy-btn:hover { background: var(--shaman); }
+        .warlock-c { border-top: 3px solid var(--warlock); } .warlock-c .copy-btn:hover { background: var(--warlock); }
+        .warrior-c { border-top: 3px solid var(--warrior); } .warrior-c .copy-btn:hover { background: var(--warrior); }
+
+        #toast {
+            visibility: hidden; min-width: 250px; background-color: #333; color: var(--gold); 
+            text-align: center; border-radius: 5px; padding: 16px; position: fixed; 
+            z-index: 1; left: 50%; bottom: 30px; transform: translateX(-50%); border: 1px solid var(--gold);
+        }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+    </style>
+</head>
+<body>
+
+    <h1>Cooldown Manager Directory</h1>
+    <p class="subtitle">Import Strings for Midnight CDM</p>
+
+    <div class="class-group">
+        <div class="class-header" style="color: var(--dk);">Death Knight</div>
+        <div class="container">
+            <div class="card dk-c"><div class="spec-name">Blood</div><button class="copy-btn" onclick="copyText('1|VdC9SgNREAXgNZvKGO0unjR3ZezENzCN2lkIIsiWC4oJiNtERSuVoBCwFGwDruBjhFQGib+PEAs3ia7/YOUcYwqbD2buZWY45fRudTRfdfdPpuCn4btoRDAJ7A1MDNOF5GGecZHAPOac1IwPew0ZgQxDsrBN2HvYW9grSAamA3uH+jFkCK0JjJucM1DcJjtKEJM26ZAueSIv5J18kC/yrbRelYdDJT4iLINPPWPwkkO3IGeQGmSe1Yb2M+e8sYn6An/ye3FTO9mQ5ZvSrpAlSHQ6Vu7XvRc2U5X+Bh0itb8lvfH/hupm74AJaU5MKGFUjcjZ+82o6i7OrgSlgje3XlwtlLxJb3otDJd/AA==')">Copy</button></div>
+            <div class="card dk-c"><div class="spec-name">Frost</div><button class="copy-btn" onclick="copyText('1|PdDNSgJRFAfwabCifID6i4uifZsEWwURtSnIpncI4lwZ0KBoFUMItSrInII0aeFTFC2ieoJ2bcO+IDMGy4LO/5ptfnc4c+49H9uxrerwVBAF4TSkDtMH0w95hbSQTUOa8N/hNyCPkCfIC+QZ8g35gbQhn3iYgXzhdhLyAXmDNBJOz2qFnJBTpbiA67aemWWYGIyjn0sDymFKWazzzzhj67xQJlWYXoY3FG9QKeyRc+XgSinNk01yp4RMDlMwrp5HLOlNKMcr5F4p50g+4bhjQ0zdZzmPLVzwjSRjl7iJWDPOjmtnozs22E0sJf9ainfS7EX7TrHm7v6PW+mMZ8vbGe0C7ODdRYwU7DqbdmEtbjebDqLZuZyfX/sF')">Copy</button></div>
+            <div class="card dk-c"><div class="spec-name">Unholy</div><button class="copy-btn" onclick="copyText('1|NZE/S8NgEMbbGFSosSJaewVpHB1c/AIuUrRuheIfipJBkmguGSyKmxVdHLTaKoKKiF9BHKxLcfEzOLhVqAjiWBT1njdk+XH3vnf33MPt6Ts36anK7nmeeIQ4TaxlYnE7RTxPz4/k/RLH5GHIBlziBHk/xN0U3FEQEA8QJ4n7iPvlf+2duIf8D+JeYoO4i1inVlV+CvdoXwc8FH4j4kxMWylJVI8Lag+CY6TZHHEKTW08b6C0BtRROoOqC+kc30T0IjghYAG4Rt0Z6k4Fl0+Cqz8pnt0SLOpAXrAkMlppUrCcFFhq6CgGvGEniBtN4mHiQQmPWoLqK/b+wnyMdhtIP5H6AqtzO3ao+sPVlSNMVMOUQGhVuczmIqvKDiyGdgpt7UApiHbkxOpEwkrOaEaabkPWM/dxBjmGnASHSVSK06tW2THnfNd2yuaEWfSdwNv+Bw==')">Copy</button></div>
+        </div>
+    </div>
+
+    <div class="class-group">
+        <div class="class-header" style="color: var(--dh);">Demon Hunter</div>
+        <div class="container">
+			<div class="card dh-c"><div class="spec-name">Devourer</div><button class="copy-btn" onclick="copyText('1|Pc+7DgFBGIbhXbTY0kokoncVtnATRCJbsqxzNDIRbGE7iehwF07J3gWJG3BsJGrzTtA8M19mMvP9w8hgmeiLt5hnzUBLanrJAwc6MIGxGehyzazMIEx2oQ4NaEILakktZJ25uiBWJL4BMWIVlsSCpHyBh2S6Y3eFG9zhycEGtrCHAxzhBC+eikIcctCFnmSWAhWLa038p/JCo9+XqotqoPqpVr6RFt9J5PDinbfsttNybfcD')">Copy</button></div>
+            <div class="card dh-c"><div class="spec-name">Havoc</div><button class="copy-btn" onclick="copyText('1|a2FpWChR2dg0Q09y3l7Jefsk1wlJrguXnHdWcn6m5PwsyXnzJecvl5yfIzn3j+T8Lsl5DJLzqyXn/pecxyw5j0lyHovk3H9SDIy//EDEQsl55yTn6UnO3ym54AZQILEKSPzUARLpCSAiEUh8Ow+SqAQRJZILRSUX3AQy/zEDiR8pIMFmyfk7gPSbLCDxXhNIfAkHEYdBWj1BRA/IzBUg4vcShiaQW9cJMXXBbAMbD7YysRLV+MQShDsUWsCe1QO5+945xkagzxpdPRLL8pMB')">Copy</button></div>
+            <div class="card dh-c"><div class="spec-name">Vengeance</div><button class="copy-btn" onclick="copyText('1|RY+xTgJRFESXXQz4Bw6VNlTzQmNNz9rwCkEwShaygoUkVCRUssJa+ANUJBsI8AV8gLUl30FoTUj0XgihOS+TuXfum1H6PbkaJF40uYWNYefgAqzCzsAYfAJbYAP2FbYD44Mj8Bkc55zUXkY+wBrYBO/BB/ARrIB1MFK/nHNcLy9wXwROSeU3uJI39Qt7Bwbo/8BkYLIwl+h/ytbfQOz0DlyKCBoi/J6iqLKqXkGQeRNcDBVblWuYzdyJ9OeM3a/T6mHML0rY8azfk5uH84Ly9Bx5PdaK2q+uFW3nZiiJiVeqhN12GHRb4T=')">Copy</button></div>
+        </div>
+    </div>
+
+    <div class="class-group">
+        <div class="class-header" style="color: var(--druid);">Druid</div>
+        <div class="container">
+            <div class="card druid-c"><div class="spec-name">Guardian</div><button class="copy-btn" onclick="copyText('1|TdE9S8NQFAbgNAS8TbsUHPoGhwyiXRwddHERA06CXxG1tNAlFQQLxU0k6GJ1dykSEPRXiINO7i4OTdraptGf4OB5QwSX55Jzcs8999wL4zwonwSGf7sO9xXui6Xl8rql6eURVAyzg6tF+Vp7k7j+A/Na1toR8zGZkAT2ClQfKmKyiXwJKoQ5D9WDMqCGUAOczkIlMG+44VvYXIK5DDXCWRPqSzZOxWRCEsKYKrFiFcUa1y0Uu1wPyTbZlUKooMC098zIDnHJPjlg4kn4sHhwSCLSJwMyJJ9kTORY3XoXZh7IozCXZntC5U5wpll5j3fwUXBgju9z/t/N9E7WSvZbVdJpk/97TnfLPaRxKWBfcngcWpQOMtT8bOLyCIGxsdpqew17wXba9VbDqx//Ag==')">Copy</button></div>
+            <div class="card druid-c"><div class="spec-name">Feral</div><button class="copy-btn" onclick="copyText('1|NZA9LENhGIX7835X0sUirWO6VX+JWDpZupXEYBGkxgYRVEITCY0I0kRpQom/SXJVTMJo8TOaRWLgLk0lKIPV5j1XLM899zvn/fJ+Jy8rTuOsE1w7Gmzy+cN7xK4i9QB5hKlTWe2GScB0woDujmImRLWvSJ+h9gpZgGxAClgOQDYhZXUyUcgppKhy+gKyqF93BFdViANZhyzpwcuUohLH8RwkBysE8w0rweEYTBHWAaxD/Zvw85I3qgaqcybaiBailYaPxqXiuUT1TtSIT0buqT6oOrj5DXFN3BJ3ilGXkS/01CM5xGA7ksM0OeX+sJKqItJMj4ikiC1imyjBPLGaE6IMox0EBvp4A9cIe2vY5eiqxgKF/+NMzPP0mTqgr/dC+m674DWV+6upEve6Ym1synGC/cns/OSY3WX3jmfTmV8=')">Copy</button></div>
+            <div class="card druid-c"><div class="spec-name">Balance</div><button class="copy-btn" onclick="copyText('1|PZC9S0JhFMY9by0NtSXniMVtacr6B6rh3pZCDAQlR7tXITAtyb0u0XIpGxqiTZwk1xBadekLmvsAo4bGMrpFU+9zEZffec4n55z94d0al1zfPU1GQpQZ01j74xznucn3XEesxmlu85m8t4SGhFjHCudCVW0fLzW6ntCOrCwKHQodCbWFOvzJLzr11OCetE6EFNvsCDU4LlZeKIa5HSCqsf4GFYZ6hZoGZkSNisI+mXGNzTRQAraAbWxxpfHQhTsP9xa4A26AayRSGDABtQA1KWTBBgvMAnO4+FesEdSUxfLg/2g8L0N9Ad9iHmNiU8yLSEglP0SluIKMzwn0FetTe3qy8gY3hDnOiaCmf05QNjg2GjQbB/ol/f/02GHb9VeXypUNx4gZZraQLdq5fw==')">Copy</button></div>
+            <div class="card druid-c"><div class="spec-name">Restoration</div><button class="copy-btn" onclick="copyText('1|VdC/LwNhGAfwu8bYXb/H0PfeSiwWpCQIF1GaUtGE2a9KxNCkbrE1l7YSo8kqYhB/QBcTAxKJ+lGCBD1miaVrPd+7yfLJ3fvjeb7vU+4oHcaKXss7mILeg12yDHPlAnYn7BGoLGwLNmDHuHxF7skleSXP5IU8kA/yRL5Ig/jkE7UUVEY+m1WoMSgHaoIbj+SN3JC6ZUQWuqDG+fMOJZemoeagZqDS0Hdo/6B9BD0q52ZNYXgSvbfQTegsfs9kYSgpV1d9JNh3Y4l1vsk1e+/KgYFuciIMngvJPDkV+htkn8yTKHq2GGcdevnYLP8PGuSuRypBxzCPREn4EkJVghLh7bBeUDkal6dnwndzCg4HUUsZngw6GLvXyjlusbC26e4spuN98Vx+2y38AQ==')">Copy</button></div>
+        </div>
+    </div>
+
+    <div class="class-group">
+        <div class="class-header" style="color: var(--evoker);">Evoker</div>
+        <div class="container">
+            <div class="card evoker-c"><div class="spec-name">Devastation</div><button class="copy-btn" onclick="copyText('1|NdC7SgNBFAbgbBKOYK/4p5LUptLCe0BTaeULGFJosFHBoNh5CVsGoxa2i4GssbGwUIwgqLm5ivEBlkEfwtbzj2zz7Zw9O//smXLywBs59hJHFzm4N5Am5BFyD3mCuw+5S8Wc7WkyQ+aUXh3uAothSBfSg3RYTSG8hXwgXEnF4tkqzCskgLxBPtmehfQxMAhpI/zli0mYGtMaqOzpM8jDLEJedJkfIutK8ZpfVskpOVNafaXNv+k8kKbSzTJpnEwQn1wxdYx8Ke9JyDNMGsaBtLhnXvn+YT/D7BNldYmH1lmec9Ug/qVzaAeMV6JukGGYjbH7dAiTjjKL/v9kNoxjOTZqtKzXppcQ3ZyXWM6t7RZ2SoXSxtbmHw==')">Copy</button></div>
+            <div class="card evoker-c"><div class="spec-name">Preservation</div><button class="copy-btn" onclick="copyText('1|a2FpWCjRspCtaYaNJHOKJHOqJHOGJHOaJHOCJHOiFAOT/X9JDlNJDhNJ5kLJ68slmRdKMsdLXrsneW22JLOOFANjTBFQkYOVJHO25HVFSeYcSRYxSeYuoASjiCRzriRzniRzgSRzkSRzsSS7hiRzluTbLZJvN0sy/5ZkyZRk8QEqFPwk+bsPSCckAYnYaBChI/nbEkhH/QMS0dtBtoiACGeQ3HMgkbcGRFwFEddAxHUgkR8IIoJARAiQKLADusvRHsjKiJMUmA+iY0FE9BKGRrC3mFrBXBQFQDcptID9kQ32Rw5jI9gnC9kCHUuK8pMzSypDPRV0FQKKUosB')">Copy</button></div>
+            <div class="card evoker-c"><div class="spec-name">Augmentation</div><button class="copy-btn" onclick="copyText('1|PY49TkJRFISRmNkCDJWJG7CxsCL0dNgjBEQKwYI/Q0MeELYAJmpwA27CxtgLig8DIihGbMirOfNMaL65OTNzz2ntNvrhtuM53UNiQDwTc2JBfBJfxJD4Jn442SdcYhQJBKMPkcBOyrx3YkxMiA9iRkyJP+JV5oJukniz8HFduOf4gHih+2hu2jOcVQ0neSFjKPaIlfRKuBZuhFsFjvR6EtZqXmqWJX6lpxp3DRchIWHbYkulakLlLtjx1fZvh/99v2yf7DV1vH+u48Vj5dx5tlBKlfLFwgY=')">Copy</button></div>
+        </div>
+    </div>
+
+    <div class="class-group">
+        <div class="class-header" style="color: var(--hunter);">Hunter</div>
+        <div class="container">
+            <div class="card hunter-c"><div class="spec-name">Beast Mastery</div><button class="copy-btn" onclick="copyText('1|PdDPLgNRFAbw0Vp4BF+Tw1hMYukBJKShK+Nf/FlWaRe6NBYz04tWRLSIlcSKjNQL2NgQD0K1C2vazlrifKrd/O7ifOfce8/JcDkaHY+SxzfTCO4RPME8pqzE1IuSvkNo4/UWsgRZgyxDFtH1IRuQTcRfiL9T1tCcwHh6VmchqxAXso64DVnBmAVZgNOG09X6/A+cDvO75EophuSQHJGy4m+RbbJDPpWzN/JOGuSDNEmL984o58/KxbVyOYLwgdN8JTOJsM4xWZIjedYMOSCl+kRFGxK1vxf2U//Ng3ypn/ezvYFFY5/2/jr4ufF0Q1ZF9xUl3XQh5+3brlLYC34B')">Copy</button></div>
+            <div class="card hunter-c"><div class="spec-name">Marksmanship</div><button class="copy-btn" onclick="copyText('1|PdDNSgJRFAfwSQLnDtxZBfYPApeSr9BCwnYFvYILy0ojcyPkQE6apSMt0nJr0udSqWURtCifQWjlEwxIS89f0c2Pey7n3vNRWjxrL4fdkduKwezC7EGF4K3BHOCzACsILZrQ11Ad6C+sfiD1Df8H/i9Ue8VYiPeg01D3sELQDvw+LAXbgL0Dewn2Orwks97Iu7BZEA4uSZGUSJlcCPkbppwyrDBskj3hf4MnfpVvMMVhikvOeXdL7kiLDIWrB/JInsgzeSGvQjUr1DzBiwp1qRaI/PHtbscoyuyB6qzCpJ1JE9OqFZltXjg5760ZLnMHXJYzXYk72tpOnBzmMomjXGr/eAw=')">Copy</button></div>
+            <div class="card hunter-c"><div class="spec-name">Survival</div><button class="copy-btn" onclick="copyText('1|NdA9SwIBGAfwU/oQ/oWHs6Gl8BMIaaV2zuFQ0FDgYBcNQYdDkPZCcN71srlGYxmEW1anglv1FcIlG/OE5p6/0vLj4YHn9XSmehObrR03VuJGNHMIWYdsxI3IXoM4kE2YLQ13XMgSJA9ZhliQDII+wiLkB7IIKcDuwO5iXESYhN2DPdSi3DwkC0lDVjE+guiMSOUZZghzxPBb8T7IO3nDXIpVCySp5B/IgOPrxCcXxCOX5Ipcs9sTaZMX0iFd0iNfintH7kmTsL37qNR/Ob+k+AX+4ZUVAYd/3honmtm2pu8xW9Fz3Z8Zb3Idi///lulufuJscnOWZ+u7gn7NWjvYd8rO1u4f')">Copy</button></div>
+        </div>
+    </div>
+
+    <div class="class-group">
+        <div class="class-header" style="color: var(--mage);">Mage</div>
+        <div class="container">
+            <div class="card mage-c"><div class="spec-name">Arcane</div><button class="copy-btn" onclick="copyText('1|Rc8/L0NRGMfxS27iDcgT32O43gADSm6vNEpilJjbSLgsBgmj/24amnoDYhOrCUnTGpgMltvZgiaC1dBELX2eilg+OWc55/ct+QfnAwtJKzmNqHzDD+katHEleIUX0idkHImQEBlFJpFZGh4yhUxQaXMSIBlkDMkiMzTLSA6ZprnovJ74C7dCY57BDb09+7gY96DH5VS5GVbCunGrZPuVKLDTmZLrU47ujHvlqqpcbxnbxo6xa+wZ+8alPTpiFIyiUns3PoxP5fHtwjvUqN7y76Swruv+/u6u+F8WBUPHFmmF3TaN1GDJJK25/Ga8tL7aAQ==')">Copy</button></div>
+            <div class="card mage-c"><div class="spec-name">Fire</div><button class="copy-btn" onclick="copyText('1|TdDLSkJRFAbgkzZqoNVSz/6Pk5z0ElbQ8UIqEvoIQeAlCHuCbqRwXkAceaI3OFENIlFwUCMnzZoUPYjrPyo4+dZmX1h7/feb176p+9Hb/gHsIbwWvAvHirj7kDykBHEhNXhtSAX2I2afsL8hBTTSkBykjNkX5BhShJxA6mg4kCrkFH8/jrWRDWAKrM/K4UAZ/cNraj2bAlUYV5dHv0qrozx8kDGZkKnyHiNxsk12yC4RkiBJkiI2MQTEIWmYLXa45EdeyRt5ebLuOImOJJVIL9xaHS7uBuGDtf/udZephDFpNsukapkb7eFH88Xm1fkc')">Copy</button></div>
+            <div class="card mage-c"><div class="spec-name">Frost</div><button class="copy-btn" onclick="copyText('1|NdA/S0JhFAbwq7g0ve8rDj1S4NYa/YMQy6XWgj5Cw4WGghKXBL0SKTgLrdVWDc12sz9q0Xi/gEtC0TUt6AN4nvfS8nuXc857znOSqJxP73jVszwa7whmoMfQo7QTX23CLEAPkbxAYwB1DFWGuwZVgqpA/0L9wV2H/oZZhEkgNQWzBR1C/yCYhZuDWYFZgtlG8iHtxPbn4e7Km/0UetfCXlE47ZCu4LfIHfHJPWkTtvuP5Ik8E7b5tq1HXsir0Jnj+Buh/yZ0b4X8FRnwo4AbDMkHCcmXXJtNwSxfOp4cFq//F9pmW2j3ZWE0K5oQZmqSTxSVhKRHNrCxhOhtbB4eHBUm')">Copy</button></div>
+        </div>
+    </div>
+
+    <div class="class-group">
+        <div class="class-header" style="color: var(--monk);">Monk</div>
+        <div class="container">
+            <div class="card monk-c"><div class="spec-name">Brewmaster</div><button class="copy-btn" onclick="copyText('1|NdC7SgNBFAbgdY0kb6B/IGRDhHNURPAR7FPYCyK4oMYkEGVsZRVtxUZbsbWx8CUUL6DGGPE61iJods3FyzkLNt+ZnZmd+c+sJ1b3BvwgDHYLMCWYRZgiTBlmG/QDUwH9gh1wJ+30ZN/AvbDjONoBfYFCUAsUwSZBbbALasKmYGugb9gbUBd2CrYOuwHbAHUwlAGH4GbacfORnDh9ptyC5fckOCVfXk6nnmSHNwv+xPA7RsbAEbiL14SunQhzWzo6VC+US3NJ6pVwrdaWh3IE/tN4rD8qj8qy8KFZuzMwrC0L2WAP0K4ca9gDcJ3Wwtp9bk6FcJOe5m5Ir7kK6igPH3fznz0deEL9KOwgnC5Vy0Rv1Jqr+Smlmadmv/gE=')">Copy</button></div>
+            <div class="card monk-c"><div class="spec-name">Windwalker</div><button class="copy-btn" onclick="copyText('1|a2FpWCiR3tg0Q1+ybLJk2VTJsmmSZbOkGBjF1CTLZkiWzZEsmy1ZziRZ9k2y7I9k2T/Jsr+SZT8ky35Jln2XLPspWc4oWa4OVJ64GkSsARHrQMRayUMFkmW/gcwMEP96qWS5GpC++wMkAlJ28y2QEH0IktsleagXSCcFAIkby0GEM4hwAxL3wkAK7oK4LpLlmiBOCYhzCiQHsveGK5AQmrlYsRnBAcsxtYGNBuuEmQG2WPQh0CkKbWA3wx0JdTTYD42Bvvl52Qq6CuGZeSnliTnZqUUA')">Copy</button></div>
+            <div class="card monk-c"><div class="spec-name">Mistweaver</div><button class="copy-btn" onclick="copyText('1|a2FpWCiRtpClaYaJpF6PFANj4hYQsRFEbJXU65fUmwpirgcRm0HEJsk3syT1JoCYGyT1V0rqp0vqH5M08JPUmyxpECCpN1HykISkXp+kXq+k3jRJvbuSevck9e5L6jdK6h+XNPCX1L8qqTdFioEpwBRoRMY8ILH5mqRhFpDe8EzyIIh/8BqQOBwAJA64Sh68DVK2QPLDFSC9yVHywzogfa9DUu8BSHwRkDgHctt+RqCR/heArK3MSxmbwLb3MXVBlIO0XYGYBFacsQCsF2LrAVew1QzNCG+DQ0GhBeQ7oL+AvtNPV2wEG72QJdyxpCg/ObOkMtRTQVfBN7O4pDw1sSy1CAA=')">Copy</button></div>
+        </div>
+    </div>
+
+    <div class="class-group">
+        <div class="class-header" style="color: var(--paladin);">Paladin</div>
+        <div class="container">
+            <div class="card paladin-c"><div class="spec-name">Protection</div><button class="copy-btn" onclick="copyText('1|RdDPLgNRFAbw0dphK/lmNVNLJN8r2Igi6fjzACaKVKRN6Exb9adGEzRRsbPSDn0GG8u+hi17b+B8Fbr53eTck3u+c9uTrXQ2zSZPSxhOI2ogqiM6BW/AK/DadSamTsAEbINd8BE8A+sqz4k18AK8BGvgOdhCPAM2wBi0R5pgZF07ebHiOplcAVETn2/grUqBKODLB+9Q+wY7Vjh8BR90sSG2xLJYxfBd57rYVOOz6ImB6ItUvNgoHBhuToSGvyD2RV+kQn3+h3IFiOcHfmLalMz9OO9fTEv1HztvcUfJxylHO3S85Hdzx76um2a3g/AoLJbK3qIXHFeqe7vVUqX8Aw==')">Copy</button></div>
+            <div class="card paladin-c"><div class="spec-name">Holy</div><button class="copy-btn" onclick="copyText('1|a2FpWCja9K1php5kka9kkZ9kkb9kUaAUA2NiO4jokCyaJ1k0X7IoSLLoqWTRIpBYC4joBBFdIKIVRLRJFv2VLFoiWbRUsmi5ZNEyyXemkkUrJItWSr7bDJS/e0qyaJVk0WLJd5Ml3z+UfB8CFFs/GUhkgYjECZJFIZLvikH8GSBiOkiwF8SaAiKmgohpQGLtQyCx7gOQuNksWbJxiWIjkGRqQZgD05w1Q6EF7JClEHcxNCF81PQt0LGkKD85s6Qy1FNBV8EjP6cSAA==')">Copy</button></div>
+            <div class="card paladin-c"><div class="spec-name">Retribution</div><button class="copy-btn" onclick="copyText('1|a2FpWCje2DTDSoqB0SsQSPjXSm65J+l9WdL7kqT3Y0nvvZLeByW9j0p6n5D03i/pfUDS+6yk93nJ8AhJ74uSYY8kw8skwyMlva9Ihj2VDC+XDA+T9L4gGR4ONGnjWSCRtQxErAQRq4HEakkgsUEMJHsGJLYCSKyaASLeAQmfRpDEaRBxStJ7J5DmPgwkeEyBBJ+Z5Ok6kJpVINUg4TXMQGJdP4gAub4KbN1SELFc0nuHpPdukFWOIIUTgcT6FJCx56QYmFxKFys2gmmmboiZWUshtmUtB1sNsxLsEj4zsMMgxnEfVmiBBcxlYDg1hgYk5iSmZOYp6CoEpZYUZSaVlmTm5wEA')">Copy</button></div>
+        </div>
+    </div>
+
+    <div class="class-group">
+        <div class="class-header" style="color: var(--priest);">Priest</div>
+        <div class="container">
+            <div class="card priest-c"><div class="spec-name">Shadow</div><button class="copy-btn" onclick="copyText('1|PdA9S8NgFAXgJBQ/UhHcPIUXL6jg0NGvgEVcaq3Walt1tdCCONhRBwUrrXURBAcdFD+gjVuHDjr4A/wRjv4AF2e9JwkuD2/eXJJ7TiN2+jQ6Uz+7zScs+/6EHCNZgjiQGCQO6cPYL2QIYuPR0/etScVvQPphZmGmYeZhFnAEyABMCuMuZJhzJexeQwZh5mA8VC71br+KqR1Ul/h6lRSQ/ED5NWE5qQN9bru8zJIcWSOb5EZHsnGe8hyu8ZQmyyRDVsg62SBFskW2yZvycMd/+ORT6YwQfqXTJV8MBsIy/CY5Jy1yQd7Jt/IyoXTZR88m3LSnOzuZH47oGs6i9excRctGuxeCrFpDEE6z/xeRi6IFccMymDkso+1qfdJkk2GlWrbx6uniXrlSO/wD')">Copy</button></div>
+            <div class="card priest-c"><div class="spec-name">Holy</div><button class="copy-btn" onclick="copyText('1|a2FpWChh0vStaYaNJAe3JJeGJAevJAePJJeWJAeXJAerJK+ZJAeHJAebpME+KQbGlfOlGJi8VSQN9kryWkny2kryWkry2knyLQEK222S5OCU5NKW5DWX5FsqyWsNUr8ASKgYSYrbA2n1NiChFgliKYGIECChqgVScAxE/ABxvwIJDTkgkXxbUui8pMgpyWInSXEGkFQfSLc6iPgA0r0DpFIWRASAiEAQAbKgnQVEvAZZvhBELAIRi0EE0JGMq0uBxBpTEHEYSKw7uJixBehsiPO5tMFOZuoFW2oPc1TybZgbwe4GOw/sF7BrVYxQ/KIWqdAGDRVQINkCwwYYVE3ffAOKMlOLSxR0FTzycyoB')">Copy</button></div>
+            <div class="card priest-c"><div class="spec-name">Discipline</div><button class="copy-btn" onclick="copyText('1|TdG9TsJQGAbgAg4n2KS1LrxM1QGrUv8TddDERGNiYuI9GAcmjOjiJASKf/g3qGsHbwBBFC/AyTuoq2DcvAH93toYlyen+c73nnO+lnsO/NS0nyjdrkA9QrXSWnxxFvo+1DNUG8E3elsI2uh7gWoi2INqQD3IrrUu1BP0fhgfaS2WLcLowviUpTtJpvA2CH0VlgfjHVYGRgfJPCtDCGbY4ZEqOSLHpEbOyQW5JFfkmtywfZiMkFGSJS4ZIxNCnvu2U/wcl4vaX8K8KSzUYSZhOswqkwo5ZOWeq1NyQs7Y7LDQEJbiwtzrXawkTw4fG6/9ZYTt9fBhUaekRYdUooR/0a4jdxgohoG2F46nwznJkGRgVkYr/f4B1fQT6xs7ua3Cru3ay7nC5g8=')">Copy</button></div>
+        </div>
+    </div>
+
+    <div class="class-group">
+        <div class="class-header" style="color: var(--rogue);">Rogue</div>
+        <div class="container">
+            <div class="card rogue-c"><div class="spec-name">Assassination</div><button class="copy-btn" onclick="copyText('1|TZFNS0JhEIW17B8UdGyT7cqCN2lkIIsiWC4oJiNtERSuVoBCwFGwDruBjhFQGib+PEAs3ia7/YOUcYwqbD2buZWY45fRudTRfdfdPpuCn4btoRDAJ7A1MDNOF5GGecZHAPOac1IwPew0ZgQxDsrBN2HvYW9grSAamA3uH+jFkCK0JjJucM1DcJjtKEJM26ZAueSIv5J18kC/yrbRelYdDJT4iLINPPWPwkkO3IGeQGmSe1Yb2M+e8sYn6An/ye3FTO9mQ5ZvSrpAlSHQ6Vu7XvRc2U5X+Bh0itb8lvfH/hupm74AJaU5MKGFUjcjZ+82o6i7OrgSlgje3XlwtlLxJb3otDJd/AA==')">Copy</button></div>
+            <div class="card rogue-c"><div class="spec-name">Subtlety</div><button class="copy-btn" onclick="copyText('1|a2FpWCih3dg0w1qKgTHhmWSvjGS/umTnB8mlsyR7n0v2ekpe/i5ZLSpZLSPZ/leKgYmvSLJaULIjQLJaTLJaXLJaRLITyBCWrJaSnHRdsuqqZLWk5NLXkstsJKulJatlJaslgJpEP0lWy0lOyJJc1inZFyE54TbQrqyDIOIQiDgAUqILJIQZQNwTIOI4iDgJIs6AJGZK9mkDaXFvyf7bkhMmSK4xl6wWAskeBRHHQMQpEHEaRJwFquRnAxJi20F67gMJieIlDE1Af4A9ydQDtRVsP9BQuK1nwC4Bmg53zEFkxwDdodAJ878IMEDAnpQBB4QYOHAYG4Fh0OgRXJpUkpNaUgkA')">Copy</button></div>
+            <div class="card rogue-c"><div class="spec-name">Outlaw</div><button class="copy-btn" onclick="copyText('1|PZG9S0JhFMY1G/IfqJ6mlpbAd2ns0yUICiHUKUEJWmxouGY69CFNQcN9aQhy6Hqv5tUpooSKIPoLGoKyryloaW5w6Txv6PI7H++Bc57n3e/fdYbHnVDpOAa1BJWAv4C6CxWHSsL+QTUCvzwSCF5OwX6A/QH6Ej0EOoNfAc+F9w/6EjkFnEXni7Az0kMQrB2oR2mV6Cj0GXYBOSZU9gkpLXFuBO4jKCyoZdnegMmhMSnrfFKS/0Ayh9sunbcFtnFmOsIhNQasNtcyiwL2zxJxgY5VZVHBtRreIPFEU+K/EG/FOfHB4GsULLklwvUfUiDOiStTRPJF4M8CpJDs+0RDcPXvBUld736G5vXewJZK6KijQ3Ntq97QUjHQjaPSAFtHM8L9nxj7jXIoG253AnnyKE5qP5az1TP4P')">Copy</button></div>
+        </div>
+    </div>
+
+    <div class="class-group">
+        <div class="class-header" style="color: var(--shaman);">Shaman</div>
+        <div class="container">
+            <div class="card shaman-c"><div class="spec-name">Elemental</div><button class="copy-btn" onclick="copyText('1|RdFJS0JRGAZgtduotWrwFQKDIChs4juoFYGQmWTDplpoQZiUYJO4aZdlUTZSLdq6aNlfaIBLi/oN9Ucaz3tL2jz3nu9cvu/c9xSM7ZI7UjJ2ruchI5AQZAgyDFX02OxmBTEgo5AI1BkkBtmFRCETUAeQKagryDjUCdQp1BHUOdQF1CVkD+oQEoYUIJO6jf8D8VfE3yBByABkELIPmYYEIGN6P8BZ/k8k03x+kW+W7ZqVO745SBWpJk5Sy9178kAeWasj9aSBNJIm0kxaiJtskE2SJc+aYDvpIt2kh/SSPtKvyc3xYxeXPiSWuHhBwomFVpY6uK4kNfz2lvnxyCaPbLJm8sgmz2jyD0x2elr22Byd7zf2vE7MUSw3CvqsSMrh/Pb9H2aNCLhseX1Z3mMm/peoFbAOW2fMvBmwdQ2xtrw1p2TMhnLZ9WQ6tzUT9fq84UxqNbWWW8z8AA==')">Copy</button></div>
+            <div class="card shaman-c"><div class="spec-name">Enhancement</div><button class="copy-btn" onclick="copyText('1|NdK9LwNhHAfwag0GJCpNfE1MJpVqInFNT+9EdKgiXvZqJZVGvSzYvFRMdmsT/4BElVa1VImX1KDFUFLvrF0MFs/3LpbP77lf7p7ne/e7SPVytMkdNa1u+WENwjoD6zzkaVjnYFuCPYdOC6QGdP9AWYfkbjZUKSNweOBagFyBKwbZC7kDzgqcMTja0bMLRz3vGiAeKGXWQTJEhokXqgO2Er7NcC5CCrB3SFIkTTLklOTIuWBqlIyRcfYu0OZlvSRX5JoUSJHcCRJ5ru7JAykRLdMzeSGv5J18kC/yrbRelYdDJT4iLINPPWPwkkO3IGeQGmSe1Yb2M+e8sYn6An/ye3FTO9mQ5ZvSrpAlSHQ6Vu7XvRc2U5X+Bh0itb8lvfH/hupm74AJaU5MKGFUjcjZ+82o6i7OrgSlgje3XlwtlLxJb3otDJd/AA==')">Copy</button></div>
+            <div class="card shaman-c"><div class="spec-name">Restoration</div><button class="copy-btn" onclick="copyText('1|RdC5SwNREAbwmNgKSTzIt14r3uDGJB54YqVi64GxEVYNmMIEYqbe3ZA0XniCnayttSFRCGKpVv4noiZo5fsqm98M780U8+XrbTe05Ppy15sQP8SABCBBSBOkEdIMaYGEYL/DrsKuaZ66J1dRuYG0Q/ph3UEGIX2QTsgApAOiw/qC9EB6Id2QLljfsKqwarB+YP2q7XAZAkgbpBWiwSnAMeG8wk7AeYGsax6v8cY5g4TJMImSGBlRJLfZjZIxMk4myCR/t9hNkRkyS+ZISRE5IIfkiByTE3JKzsg5uSCX5EoRnScLZBEfDapmAmQHElf1vqIo+gmfi0HyqSgNKcoRwhvKj4qHacVzDLKB3Nqtt/Afg8RVBnqe0TAgFRNc3+rKrrlnpnRDX07sZ9MZM5tMp/4A')">Copy</button></div>
+        </div>
+    </div>
+
+    <div class="class-group">
+        <div class="class-header" style="color: var(--warlock);">Warlock</div>
+        <div class="container">
+            <div class="card warlock-c"><div class="spec-name">Affliction</div><button class="copy-btn" onclick="copyText('1|a2FpWCgR3fStaYaRFANj2l8Q8U+yI1dS7brk9xZJtZuSajckPb0lO3Ik1c5Iqp2SVDsnqXZW8nuKpNpVSbXzkmpXJNUuS6pdklS7KMXAxDUJREyWVLsg+T1V8nuy5Pc0SbV7kmoPgcZmMYIIJiDhvgpIvKsAEXMk1Z4C6a//JNUeAGkPCRBhByLEgcQXUyDxPQZEtIGIDSDTJ4KIKSDNB4DEy0Ig8cYdRChJfj+6hLEF7AKwW0C2f09laoWZ+fUfzBlg0z0kFNpgPjoD9tFZoDcVG8FGN30LTywpyk/OLKkM9VTQVXBMS8vJTC7JzM8DAA==')">Copy</button></div>
+            <div class="card warlock-c"><div class="spec-name">Demonology</div><button class="copy-btn" onclick="copyText('1|a2FpWCgRs5C5aYa5JK+SJPtuyY71UgxMbk2STPMlubYBmYJbJbmfSn53kfzuKvndESjAP0GyY50kM58kxzlJTj3J786SXIySnEmSnBclOS9IcoK0C2RJclZKfneSVIgF8vT2AQnhdCkGRk8GkIHbJJl+SDJzSoqJSoqdlVS5KKlySVIVKMPocQ1EXAcRV4BElg2IsAWZlw2yF2SMQA7IhCQQkQwiUoCECIMk029JztmS35dLcjKBFGVKim1cytgEdgmYz9QBtBPmAJB7wHaBHQV0D8JWxUagOQotIH8BfQf2JkMjOBAWMocnlhTlJ2eWVIZ6KugquKTm5ufl5+SnVwIA')">Copy</button></div>
+            <div class="card warlock-c"><div class="spec-name">Destruction</div><button class="copy-btn" onclick="copyText('1|NZC9SsNgFIbTUBS9grwdpIOreAe1gss7OgguorUoNmhj07Raf9uk2uDg7FoEh+KdOBRB78JNSFw0npOky8PhfOccnu8dFvtja2fgP1XBV4Qf+LFAB+yDl+AFeANewY8RfiIKwGuwBbpgEzwFu4gmJaNg3oE9sA2eg2dgp2SYi7uKPdBD9I54CRyC9+AIDGUl2VQkgr9vGVxYl+r3RWBXwBPQxmFX+1O9sqpVAh7r+5qAt1pVpW0YoK+dFIGiL+3im2CupRgL5pf1TE2xj/gLvNDBwXMhELPUMzU2H/P97JxdyUVTA7meOuXC05m/Wotd+gnxLj9kKeWxzKLK8osmktlg26p5rlNveL0tllfKGwdtz+3UvYbT/Ac=')">Copy</button></div>
+        </div>
+    </div>
+
+    <div class="class-group">
+        <div class="class-header" style="color: var(--warrior);">Warrior</div>
+        <div class="container">
+            <div class="card warrior-c"><div class="spec-name">Arms</div><button class="copy-btn" onclick="copyText('1|PZA9LwRRFIbtRqdRSNx3LJldtUJEIWcKZDQKjaBWbdZHxg5RITuTydIoZYediEXhB2gI8VEjhJLfoFOK816hee4999z73icnaa+1OqI4HTc9pgCvCgmMA6lBbiDnSJSx05ZrzSgGq0STyJDcQpqQfcihHqy/Qw4gDVyNIrmHfwZ51uONScgLvBV4AeQV8saoPUXZQXKH7y3dRt2sjWKzwuhPvrtm+cFGgeglSgTYOFEML7AsEv24+NL14UjxOKF48rmrE9vEDu+PEIvEkuJ4Gpf6Z352DX4XJDN9kPS0GGuUNvK7/z8Ya/tnMtT5K209rJaVseZW2uqXS26dgRlHxPhUx5WL7Jyiqbn5MKwEoTvgjoXLqz8=')">Copy</button></div>
+            <div class="card warrior-c"><div class="spec-name">Fury</div><button class="copy-btn" onclick="copyText('1|PdA/L0NhFAZwVMLgCzwSci0aSatoq6IUeTBaDSZTY5LcpIOFpnHrT0oHi5jc3PjX1SCRNpFgk0jsInwBgy/gPPeq5feem7zvOc89u91lv8+PVU4J1sAjMAVvADwBx+DNghPwBvs7OoOqMf4onsQzeAz+gBmwDubALDgFToJpNBvwClisgnm7u/0AzoALeCuBBXBO7fawNI/WmZU7a0b53CjGjfSdqmG0vnROG5kD3XrRZ0IkhRpne1WlxIjxeiEuRUNciWtxo76faH6r26141/MeDR4VRUXaF5oVHOL+IxiqmGG+rlp7bJQiHyb8D5Bop45+Ior8lz/ueOGi6uGibF05P7ayuu66G5uuk3SWS+7WLw==')">Copy</button></div>
+            <div class="card warrior-c"><div class="spec-name">Protection</div><button class="copy-btn" onclick="copyText('1|NZA/S8NQFMWTGNSqVVEUT2zStNXRqeiu01n8i+DkoCLSxUDoB9Da2oJfQMdABheXbtLdWZzqFzA4uwg6eO8LLr/7uO++c887bfcqKSZu634LXAZLYBmcAmfACjgLjoCjnmWnFjgJ+qALAqyi/wRWwCJYA+fAcQy+wXm8fYBL4AK4iP4jOAGOgdOgB656lhPURe5iV7CxLTjdxO+z1GEJ2Y/U9S9wRS9DHTtG5mndl4f+k46VFb72DgSvN4q2oqfoKG4VXdV6ULyo2o5Cl6aO4L2gKrphGGjPxqCWVlr/R+fOGMgNGZfGr3ER1HN/4jPLfyTWw44JJQ+oKhnZ1xJL4h4encRxI4rDtXAvjprnZ81GdPkH')">Copy</button></div>
+        </div>
+    </div>
+
+    <div id="toast">Copied to Clipboard!</div>
+
+    <script>
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const toast = document.getElementById("toast");
+                toast.className = "show";
+                setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+            });
+        }
+    </script>
+</body>
+</html>
