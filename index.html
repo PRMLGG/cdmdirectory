@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Addon Directory</title>
+    <title>ozUI Addon Directory</title>
     <style>
         :root {
             --dk: #C41E3A; --dh: #A330C9; --druid: #FF7D0A; --evoker: #33937F;
             --hunter: #ABD473; --mage: #3FC7EB; --monk: #00FF98; --paladin: #F48CBA;
             --priest: #FFFFFF; --rogue: #FFF468; --shaman: #0070DE; --warlock: #8787ED;
             --warrior: #C69B6D; --gold: #ffcc00; --bg: #121212; --card: #1e1e1e;
-            --elvui: #1784d1;
+            --elvui: #1784d1; --bcdm: #4db33d;
         }
 
         body {
@@ -32,59 +32,58 @@
         .section-container { width: 100%; max-width: 1000px; display: none; }
         .section-container.active { display: block; }
 
+        /* Featured Grid Cards */
         .featured-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
-            margin-top: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px; margin-top: 10px;
         }
 
         .featured-card {
-            background: #1e1e1e;
-            border: 2px solid #333;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
+            background: #1e1e1e; border: 2px solid #333; border-radius: 8px;
+            padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column;
         }
 
-        .featured-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .featured-header { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
         .featured-header h2 { margin: 0; color: #fff; font-size: 1.2rem; }
         
         .badge {
             background: var(--gold); color: #000; font-size: 0.65rem;
-            font-weight: bold; padding: 2px 8px; border-radius: 4px;
+            font-weight: bold; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;
         }
         .badge.elvui-badge { background: var(--elvui); color: #fff; }
+        .badge.bcdm-badge { background: var(--bcdm); color: #000; }
 
         .featured-footer { text-align: center; border-top: 1px solid #333; padding-top: 15px; margin-top: auto; }
         .featured-footer p { font-size: 0.85rem; color: #aaa; margin-bottom: 15px; }
 
+        /* Class Rows (CDM Section) */
         .class-group { 
-            background: var(--card); border-left: 3px solid #333;
-            margin-bottom: 6px; padding: 6px 15px;
+            background: var(--card); border-left: 4px solid #333;
+            margin-bottom: 8px; padding: 10px 15px;
             display: flex; align-items: center; border-radius: 4px;
         }
-        .class-name { font-weight: bold; width: 140px; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
+        .class-name { font-weight: bold; width: 160px; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
         .spec-buttons { display: flex; gap: 6px; flex: 1; flex-wrap: wrap; }
         
         .copy-btn {
             background: #2a2a2a; border: 1px solid #383838; color: #bbb;
-            padding: 3px 10px; font-size: 0.75rem; cursor: pointer; border-radius: 3px;
+            padding: 4px 12px; font-size: 0.75rem; cursor: pointer; border-radius: 3px;
         }
         .copy-btn:hover { border-color: #666; color: #fff; background: #333; }
         
+        /* Main Action Buttons (Cards) */
         .main-action {
             width: 100%; padding: 10px !important; font-size: 0.85rem !important;
-            background: #333 !important; border-color: var(--gold) !important; color: var(--gold) !important;
+            background: #252525 !important; border: 1px solid var(--gold) !important; color: var(--gold) !important;
         }
         .main-action:hover { background: var(--gold) !important; color: #000 !important; }
         
         .elv-action { border-color: var(--elvui) !important; color: var(--elvui) !important; }
         .elv-action:hover { background: var(--elvui) !important; color: #fff !important; }
 
-        /* Dynamic Colors */
+        /* Dynamic Class Border/Text Colors */
         .dk-row { border-color: var(--dk); } .dk-row .class-name { color: var(--dk); }
         .dh-row { border-color: var(--dh); } .dh-row .class-name { color: var(--dh); }
         .druid-row { border-color: var(--druid); } .druid-row .class-name { color: var(--druid); }
@@ -101,32 +100,73 @@
 
         #toast {
             visibility: hidden; background: #333; color: var(--gold); border: 1px solid var(--gold);
-            padding: 10px 20px; position: fixed; bottom: 30px; border-radius: 4px; font-weight: bold;
-            z-index: 1000;
+            padding: 12px 24px; position: fixed; bottom: 30px; border-radius: 4px; font-weight: bold;
+            z-index: 1000; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
-        #toast.show { visibility: visible; }
+        #toast.show { visibility: visible; animation: fadeInUp 0.3s; }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <h1>Addon Directory</h1>
-    <p class="subtitle">Import Strings for Midnight Addons</p>
+    <h1>ozUI Addon Directory</h1>
+    <p class="subtitle">Import Strings for World of Warcraft Addons</p>
     
     <div class="nav-tabs">
         <div class="tab-btn active" onclick="showSection(event, 'cdm')">CDM Imports</div>
         <div class="tab-btn" onclick="showSection(event, 'ayije')">AyijeCDM</div>
         <div class="tab-btn" onclick="showSection(event, 'elvui')">ElvUI</div>
-        <div class="tab-btn" onclick="showSection(event, 'bcdm')">BetterCooldownManager</div>
-        <div class="tab-btn" onclick="showSection(event, 'other')">Other Addons</div>
+        <div class="tab-btn" onclick="showSection(event, 'bcdm')">BCDM</div>
     </div>
 
     <div id="cdm" class="section-container active">
         <div class="class-group dk-row"><div class="class-name">Death Knight</div><div class="spec-buttons">
-            <button class="copy-btn" onclick="copyText('1|...string...')">Blood</button>
-            <button class="copy-btn" onclick="copyText('1|...string...')">Frost</button>
-            <button class="copy-btn" onclick="copyText('1|...string...')">Unholy</button>
+            <button class="copy-btn" onclick="copyText('1|VdC9SgNREAXgNZvKGO0unjR3ZezENzCN2lkIIsiWC4oJiNtERSuVoBCwFGwDruBjhFQGib+PEAs3ia7/YOUcYwqbD2buZWY45fRudTRfdfdPpuCn4btoRDAJ7A1MDNOF5GGecZHAPOac1IwPew0ZgQxDsrBN2HvYW9grSAamA3uH+jFkCK0JjJucM1DcJjtKEJM26ZAueSIv5J18kC/yrbRelYdDJT4iLINPPWPwkkO3IGeQGmSe1Yb2M+e8sYn6An/ye3FTO9mQ5ZvSrpAlSHQ6Vu7XvRc2U5X+Bh0itb8lvfH/hupm74AJaU5MKGFUjcjZ+82o6i7OrgSlgje3XlwtlLxJb3otDJd/AA==')">Blood</button>
+            <button class="copy-btn" onclick="copyText('1|PdDNSgJRFAfwabCifID6i4uifZsEWwURtSnIpncI4lwZ0KBoFUMItSrInII0aeFTFC2ieoJ2bcO+IDMGy4LO/5ptfnc4c+49H9uxrerwVBAF4TSkDtMH0w95hbSQTUOa8N/hNyCPkCfIC+QZ8g35gbQhn3iYgXzhdhLyAXmDNBJOz2qFnJBTpbiA67aemWWYGIyjn0sDymFKWazzzzhj67xQJlWYXoY3FG9QKeyRc+XgSinNk01yp4RMDlMwrp5HLOlNKMcr5F4p50g+4bhjQ0zdZzmPLVzwjSRjl7iJWDPOjmtnozs22E0sJf9ainfS7EX7TrHm7v6PW+mMZ8vbGe0C7ODdRYwU7DqbdmEtbjebDqLZuZyfX/sF')">Frost</button>
+            <button class="copy-btn" onclick="copyText('1|NZE/S8NgEMbbGFSosSJaewVpHB1c/AIuUrRuheIfipJBkmguGSyKmxVdHLTaKoKKiF9BHKxLcfEzOLhVqAjiWBT1njdk+XH3vnf33MPt6Ts36anK7nmeeIQ4TaxlYnE7RTxPz4/k/RLH5GHIBlziBHk/xN0U3FEQEA8QJ4n7iPvlf+2duIf8D+JeYoO4i1inVlV+CvdoXwc8FH4j4kxMWylJVI8Lag+CY6TZHHEKTW08b6C0BtRROoOqC+kc30T0IjghYAG4Rt0Z6k4Fl0+Cqz8pnt0SLOpAXrAkMlppUrCcFFhq6CgGvGEniBtN4mHiQQmPWoLqK/b+wnyMdhtIP5H6AqtzO3ao+sPVlSNMVMOUQGhVuczmIqvKDiyGdgpt7UApiHbkxOpEwkrOaEaabkPWM/dxBjmGnASHSVSK06tW2THnfNd2yuaEWfSdwNv+Bw==')">Unholy</button>
         </div></div>
-        </div>
+        <div class="class-group dh-row"><div class="class-name">Demon Hunter</div><div class="spec-buttons">
+            <button class="copy-btn" onclick="copyText('1|DH_HAVOC_STRING')">Havoc</button>
+            <button class="copy-btn" onclick="copyText('1|DH_VENGEANCE_STRING')">Vengeance</button>
+        </div></div>
+        <div class="class-group druid-row"><div class="class-name">Druid</div><div class="spec-buttons">
+            <button class="copy-btn" onclick="copyText('1|DRUID_BAL_STRING')">Balance</button>
+            <button class="copy-btn" onclick="copyText('1|DRUID_FERAL_STRING')">Feral</button>
+            <button class="copy-btn" onclick="copyText('1|DRUID_GUARD_STRING')">Guardian</button>
+            <button class="copy-btn" onclick="copyText('1|DRUID_RESTO_STRING')">Restoration</button>
+        </div></div>
+        <div class="class-group evoker-row"><div class="class-name">Evoker</div><div class="spec-buttons">
+            <button class="copy-btn" onclick="copyText('1|EVOKER_AUG_STRING')">Augmentation</button>
+            <button class="copy-btn" onclick="copyText('1|EVOKER_DEV_STRING')">Devastation</button>
+            <button class="copy-btn" onclick="copyText('1|EVOKER_PRE_STRING')">Preservation</button>
+        </div></div>
+        <div class="class-group hunter-row"><div class="class-name">Hunter</div><div class="spec-buttons">
+            <button class="copy-btn" onclick="copyText('1|HUNTER_BM_STRING')">Beast Mastery</button>
+            <button class="copy-btn" onclick="copyText('1|HUNTER_MM_STRING')">Marksmanship</button>
+            <button class="copy-btn" onclick="copyText('1|HUNTER_SURV_STRING')">Survival</button>
+        </div></div>
+        <div class="class-group mage-row"><div class="class-name">Mage</div><div class="spec-buttons">
+            <button class="copy-btn" onclick="copyText('1|MAGE_ARCANE_STRING')">Arcane</button>
+            <button class="copy-btn" onclick="copyText('1|MAGE_FIRE_STRING')">Fire</button>
+            <button class="copy-btn" onclick="copyText('1|MAGE_FROST_STRING')">Frost</button>
+        </div></div>
+        <div class="class-group paladin-row"><div class="class-name">Paladin</div><div class="spec-buttons">
+            <button class="copy-btn" onclick="copyText('1|PALADIN_PROT_STRING')">Protection</button>
+            <button class="copy-btn" onclick="copyText('1|PALADIN_RET_STRING')">Retribution</button>
+            <button class="copy-btn" onclick="copyText('1|PALADIN_HOLY_STRING')">Holy</button>
+        </div></div>
+        <div class="class-group warlock-row"><div class="class-name">Warlock</div><div class="spec-buttons">
+            <button class="copy-btn" onclick="copyText('1|WARLOCK_AFF_STRING')">Affliction</button>
+            <button class="copy-btn" onclick="copyText('1|WARLOCK_DEMO_STRING')">Demonology</button>
+            <button class="copy-btn" onclick="copyText('1|WARLOCK_DESTRO_STRING')">Destruction</button>
+        </div></div>
+        <div class="class-group warrior-row"><div class="class-name">Warrior</div><div class="spec-buttons">
+            <button class="copy-btn" onclick="copyText('1|WARRIOR_ARMS_STRING')">Arms</button>
+            <button class="copy-btn" onclick="copyText('1|WARRIOR_FURY_STRING')">Fury</button>
+            <button class="copy-btn" onclick="copyText('1|WARRIOR_PROT_STRING')">Protection</button>
+        </div></div>
+    </div>
 
     <div id="ayije" class="section-container">
         <div class="featured-grid">
@@ -163,17 +203,25 @@
                 </div>
                 <div class="featured-footer">
                     <p>A sleek, high-visibility ElvUI profile featuring class-colored accents and optimized unit frame spacing.</p>
-                    <button class="copy-btn main-action elv-action" onclick="copyText('!E1!TZtAVTTX2(x59L(n7cUV4lWdqBowi2w(kj3M0GOekPrsSMIuxYr2Xbb5p27BVFzVZzgUmCzOKDvAlEOf4EJ8SEMZ(YmCM6SPZMS0J6n3lob)nDtmXJI)Ie6npGmB(mk87VSJe7tcxqWEwffsN4)vYSBvneg3K)ZEscTx02Dbekz5OWGNN1D2KN8xs3m7wtff(mNnzWx2ftssEY7zElJ2td8djZMm6(Pxp82bZMSH4VEdfwFlaIiFHEzu8waQMC3GX9gClacjBIE6AYJKayhG23efgfxfOJj72t9O(rH1b6JeqGX49v4Ktjvx8eyL3NayTzt6qJJw4tFgBEnjKe7fWWKruYwgonzN3c)W1Wod)Mbc6A4Gldsa2BpzcBzXj9LrRwLqaCGs1bMSWdGIBv(z43pxmkew3tJ6SybzhDy4JiqdOFVvpG0gSRXKDE(aa)M7hED)zt26h6V1BhdczlUMgSx(lIczaWs)vR8xSpaoyvaNYB6wp)GsJ4CdorBFmGjVb6vCkNBWM0IaVKKR8cyZm)azjSkQctsB2KDrj(ms5KPJUB8W3C1uCzOXElEarTtfgnd5s5Caj7JJjlOtI2hUeXgZHXVmoA3kVLKfrbCMgVzxARPyAB6AQQQAz5ABnB15M6Wcm7sdtnvnlfhfnDBxBxnShBGqlTN5Y6baOh9c2xSVWQ7aBQRHUUPLMQRoFKgSvxspZL1dS6brr0XrCCAO3wYLLzBe4c)p79cao2HahAMuukhDxV4Pz0UCg7mzydff((S2pCli44TMj3VEVFWYUEHpGB8cavtVSM4LF2wvgOk1CD9aL6U8cMVpflwEtnjhNr5fX(nrNSKsBTKsBTWniA(VdCA(psUmgW9Da5TR8xsgg(wYZj0OqMW4Uy)h9OqNXEjv1OmpIsJ2ENxiqoqb2LlJcrLPEX0TKqAHyQkipTbwAUQV6AY8cO3f9ejgiLSjLrxfjOYuHNsO1vCAALZxQEis8nXEl9riRBHcBnTYkSVTZndqL2WC3cCNByMzMNb3mCWUh39ve9uGo6MRqshhjmGK9ZLog1si)YdjQbgHNIIdwEWfKzllzBQgQ2xrsCCumEQXHwBazunJ8LnBOhbC2oMHVA(0asZ7C1zPYucr9cqDM5ZRDWavVppA5ZhEKlIIcwg9uyRybhriqkkRrah3I9GO023ee9eNZ(5aun1c0WW3)C39Gae8VSUz7Y673b(2qgd)p08IPGcLul0EbsuVCm6RkpJYR2ebeEzndxLkQyQyYWVrps4UEnnAxpqCIasxHupaHeFd2hZI3zdcE8(H35fdd4m8Vvo7CBqpWDeAhal1D00PJUHzwS0ifBhS8QFgyt7AYkAVnE00fNpKRhCztZK1mBwV5McGP2GZAt)SZnrZMD3dMIlgFD4kVXZ10So7CD0pHNyZQlbOE3W9m54wblht2k0nkjHZcKDOA4ab4nvtaVDnOmIrnoY9WvdoAwGYTFdei7m3pGPfTTTXfCfOpONNp2k7LumOLIc7WG9D5NUlW75CUa5B25QokNPboTm5ob7lvpznCS0nDbkGTw2(DzeiGvA7Qm1s8tM6oNzIUmMcSGHQNpAMktnZZm1n5tEi68Wrpv9Z0a5QjdEeAFAKxcTDXevMCsQbXJu0Y1n)urOhg)dEcCMUnq2(fYg)fbKjKkIxhqY0s18SmoyVWdcDQ6AmvpPHKbhR2hFo)0yp)L6Ve8SUv2uN6fV(iqfQ2oCorbgQEajAEjySkaAPWejtsqYtCuWb3gLZmnbEN)DrithNCSDk7q)Pm)S6feT4HJAMQGCIIRiEu9vGh709tQTFS0DZgOw(aRZUzyDMHlynsuzzdC2s1Yyy6a84QzBLrRm3GZUiZ5uUn7RiElpwLz6mwVoqBE40ebT2is6OcDd0osNcpzlZs0G62sehTxhXX8aeNCb8RjEpskBS5aI462AGAlNSDYQTDkfJ3Pseahh2dOSwabDujFooUPARJwdaXJU3oy6XrFzz15xgnS3GEx1z6b460DzmetXeJmfJCVITTd5)IP2z6ziq9JH4M6XJOgSYkJAHg4ACggUlaTrbu)DVeavhud6IZmE9gy76TjYFbzA061O3Qs5Gn1v4MaAwwPb6LMf47KHrHr01VmOKBgva50Gs(wDaWYfWrWjDm6rBnFkp4(ZKWjXvDeRS5bDdBCNaw6(K5Vq)kvDGd4lYzsMklwSmHWWP35TMKWZB06Ksz3qmVk(OjBEVP5wGNLL54)pnpNFw8iyIHTCXZzbipS3OB5HvmmCvK8SGK1BdHImDdedYgi2lm1aksdD5jV45EHl)1Iu5umYES4Qyr1pip0RdKBgW9RLSKa8mpDHeW8tqcpPea6sCF(99Hp0NKa2PJ94zLC)U1Xax(qapJPDGg7fMSJrmY2z8a3Rixni(Smwfud7fdEAfVyZOqWsEsDGwsgJQFwaeZdCmLMBz8D5LahN4bBlenqoPS71d)TFRZ4(5OA(kQRYtxDx)WLtFEhdkpusYUlpBNfAZWZSxwIJwYLfWFUjk2)ROX)Gjcz4tYoKYk6ip)zVtiPRSgEVqgzBpdBVkicugFBegOe78o)fTP1HyuO1FHKno9KQZZLW(qF6kuZdlvamnFJcVjAFcPpMeJUvts22OL(R8tJvFYvdbkYKUbGvSa)K8fKxdL0uHwQyeOR3Yroc0ZQGBArdgbhTymRFSCSjMM8LfswyEddxaBXDr(iIwG7rg(FxSparSOzZomNDhCkJc9colmkm73WiX8C9ednVmLEDNyw5XJ5gIxaiDmvAbdyzh8tRsfz(WsWw3h)q0QviH9JIP5pJLpz)wqkJPOyAE2VyPHowaPL2EJv2jhs0SfZS0kroIcqKPBznCqPB67J1oGbnmZdF6(7e4YpiDclEfFHEx6XrgnObAgBdzNYSAyubfWsN4oW)cYWWLalpTEbWcZyUlHYd9x8a2Z5bKqNpwPYkzyD8ukDDHi0izqtb(CP3wWAzCwT38w(8InKfpudSfq1mYyAkNrpMyvfAUxTnml7YymbnjHJcx(P7JhL6TyZ0OuAwZBSfxfWkm80kQtlYf(rlziGQBS8vNRwJgad)IGOW1YW)l9tqWG7qglHMaggIfyUhTcMFEMy3DXeajKvUtXE510DcpBP3ocvCUddRQ64wW9nMXCx4qa(NGsrUlcDtRIccofK(C)EMNAN(slBdltlhxhhnxtvlNI6PzAPAPzcX4zQyRPzMwPnA6IKV(iLKPViVKlQkyH5GzOuTeC16jwwpubgon0FBH6wi0dRcl11KvPKKLjP8XFb3)o6fGf)ykRCFF87F(BF77F(dG6Zn7(4pjsWlBCpdwmuAxlZXOejZJ2Qk2AwsbRP(GXL1tNvsyooJBFuMOcflM8YLbKEbGYfwsFqbizQUSKyPqe)AC6XVYfFq3QAqTtdYnC5cScPmmal7eF)ZttlKrkgf(leREf)ew68v(mXKcz89FK)7lGdXc449XsApA8It87aK4V65RY1Z18nPOwLum4e021yKjiGkLF1Q2aActHo7aEbNd6JF4BFBXQvxY(V)3)NV9na79FZ76ITa0SFRmnInQXkxKXqqKjC)wWQBc4MBvlY6gsLEAYjrrfIPN(P(BjmXduiIpuuC9)pRUepPVtG2J)DHFFzgzHi4OEDcxMxCnMR1tyndcID6923mE0932xa5K2jlGXm0lkiHBIy9KZyTgp4ModVD4TV5MoVRGf1j1NYEvrQmhd4Q9Enk(SkMNwf9Eh0ZVQEOl458po3ZlhgGup0)H4JLONvLCqT5OD(RXZ9)aEsF6Dhw0j4YyStEeucoylpykqP5BIJ2VduBA9hmihPrZiHhN(hjsfK0HfEuMiAzgkbN7tfj1BdERivR)sehRGu(IGftkpHq8Q7Ys5HezsUHXegHHDa5rfWCWIfuW8MIuqQp)TC5JYnK6EyP)s8(c48gUVqzmyfhFx9sYVALCPovF74ubQY3dYZlfc35sVtG10a0F0VE7NsPOTQdynIN7cW94rxpOr565sKqB3LOg8mveGBjwzQGFpHr0HHCFyzUZ1Sfx(FHwAKzawGABvbsNnjkm4z0Vvyl7kO7Gv7ZxQJGcsVQAO3GERE4OZ3qvfp2TyHmALFabKOx4VYFrAcOpGIGC42SftYjqigc8rDq3f6d(FiAa8Ur)k6arfnfkIkyqI4RtkoxfWbd)QrVJl02Hx3vPw81CKkFJRmxl1u5APAXZOAEGJgYl7OIecuUt8AvqLIHMutAUGUKsbpyaN)XdYmxowiAHcmpqyrmiNWIYTcWpTAmPTw)in2vNtsOQ5e4T(HDcaNzsVC2hBQFgtsAmY4MK5R7HbZcSu)Jeds7v5goEdqXjuSXPti3dD1kIgh0TL)oNd9d5H(XyJ(OZc6r4HUu76gv8q)VX(L)AtoTKSo8d0f9xVRWI(WB0MV(hVyYPPegT44jLzB8WsVsJCOKcUUJg3FW4jLufNIAvvmAmfxS2BKk3iHiJ8lp1z5pDjg778OKQfyO6PZOks3WOC4ch0hMZBwcdLTYF0hoVC)3ounkAj7yf2)etKZjnjrkhkXqAhxIH(ljJUA)aYOR45(4twAvUrlPSBszBkj6NfPpwiGPBaTrR3GGQGDVAm7nRrv9hBXwK7WlElu8QiZkIgZfPqZfGNjmZ1yKhmR5(hQySNkPVCsCozTbvvVgM7c(R)0zT)Iab)LuUcGkmn2p8bIWRKYuS4YAM)LurpbnKI6bZgEriHYykkFceKHnBRgHwvfYmvEvwuArgb44tQ(kHrzJgEvS8OAs4ibeJYeyy1bHXDYBCUqLseUnymow2y5OYpnxOIhXZU02sZ1sZ2sXqr10vrT4f8jPN5Y6jxAjDNebig7E1T20Yu1ewffnxBdBdwjtmzBTKEMlRhAkokft8mJjJB8eBqYgRblIJPHTwTnUApZL1tJcwEZtIINZOxEWenum0vDTTSnDb0MsrLPSDmunTuTvmu1SnmvlE6QwQgwkooUk6A6Mk6zZjlC2DzrdX3b2tVfqjgok62WSsxh8GAO7AzO6QO5yPR64i84yDTvDSTCvGJIgEt8Y2HlT1naiYbwlhlBvlT86LHx)tHJgU8QAQanW2uZY10XmROBm8OdwmoDtnxxDDDTYhGmLVvqBlxYeQ5NlPvUJV8n2ZC5v7JMgv4FcmI4fw(apr2x9ZFMBr9kqfwatngSf99tiqeEP8cw6kadJRRITJQPbyGDv6tBU3(4dpOB8w7V4qdc8tjjLIjFu0uxtZEPH0I8YnvinnN6hWnxZiZK2w8IiI8SzBAzfTf2Yo10iUsqgJMeDYPxH(kT2HNyQ0laCZ23R5yaL)XNGM5GsyepHyS7rswP(kBJQ5voBIxXUL3OkB899Wwt2J8b(bABLhGcycEYZjuYwrNDGjtdiyjacxYjbPxCC(lYwKcK)wYtZDw2TFVpCuQpAAXtUu2aOvURPOfwMILuNhG)rVjd9SqxZUVp8WZNZEukIPYzR3IyjxS8nr0hW7VCvCCr7fPZPOTgU(08nLnwd5UxWhwcl3kfGv1RdCbpx(YuFhZNDbaMlXGtLdTORTIxDHIwFVO3qSfRuRa89OFIF278e80JY5pax)WNE))67FgRGx(r6os8yE4nug1YPjQL(rslKCnNRJRAb)0ofS8YiHs0mkSrCvduJMr1uXmTokSx2lgVRm5Aax6(p4sz4sa7OkrVaNXm7TMJVQHMezAbfYM5n7dqq9NDX)RD8Atyjj4AziVC9doYvpiOPbF9WTq2W6cctd0I(V5FTtQQvUUQYMjt7a3k4FIzUB8WbtMYdT(GknAHUTk45O9P4j9m9LvxlK4AI76XH1pGgCTgoVCoO74rn3GewZ2wY4PuDLJcBr(QsAJtRv1p7Q3U(ErL7vn38Iu2xtJ9rIFfnodynljYDVqPSxYw3IAhoB9YzYFArhH8ewh4C6HXFoYwVwlY1OJwz6dv(hZfYu7egn2lCnrm8oBnBlicFviCziwxBHyGDmST1H(ummGWuuClID0rx3sXgcX3q3X22Wip2Xh5po6bFXNM(2ONEinu1O8TXMidNwNgWtbOUsktHzRgj)d6SCfgr1dOr5q(gFsS91axXbfzp1cOnqZOnfqhqFS)hzwzYSLRPo0FSh)7DutsyYoyIVJw(DehePTS11TTCnDTC1CYtbXlIlObRJsrB4Z1nKNCGkV2x8BCv1ZKWOtOE8pYjfmSlzjh9aAkEbQBKDcQHp5Qt0oYyX)7QVaL8Fsrq3JLuU7cFG7pOZ0RE7T8Y48HO0Amayfi0yvhiW4pKAgyVp2If2YUOKec7oTK308OqwHcUWeBs9FnBYV2z84HJgFAx0jx15Mo3EAxZB68MbN2vmlUIt6A256o9hEQp6JU9TN2veO6xpQ3jEr7paa0RUNFPYoLl8pI1S)47h2)0UKd(LrV9udMJh9M7pTS90wnjx33StRhm1IFOsg)epayU(WJq5ZEwRIN(02yFEoB04p3cIXrAb5K4G6l155JWQHwlEPwKB82iV5bAIfL9Gu2w9y6ii2hH7QnepjLFRn2f4rjSsjK)fE4UR78EqaB6l7(y34iXISZVDWsViJnDXIXMZRiyLE4xC8n(HDJIxsY(GRY(G38PoSlRdobAeDqH3u8kCXk3ETwfAyhoMY8O8liETjHvj6DC5wc99aza)mBb)CmbqN4hQ1sxSw(IuD73vAVzVw)g3NMxZI(RcYf98(0xscB7XgQUFLBdX6Bs)8OVncDzL)ovyqZ86cdPnwiGhSAD(milH4KJ(sX9)Tt3r)YGpHFiT(0WBNmS)G0YyLNfxwCCylSVbnJtB1YjJ6ZRb2yYo8t4E6omp6lx5NaCvpZHct(riTTuiFcjGSa58sVJ4nNm(9jKUt9wFlEtM6YU6LrynrgIFZsF0lGjufUFBNGaGoUSeWWk5tk2O(cJ3EDS(y8VrwmKJWbp9CQRR3u4JHrSVHuIpngC5ML(QhM6np52OUckLyRCV)8)2Fd6LEcKhtMn5NU5943f5FsKycNpx2lcGY)EJXcSJ9HaRzugnvLXQi8mT9zqCFrxcikSN9r0bTdDdQ9f)d8IqJ)RxaGXsaDKpnM4fSLvNS8TiLh1Cw63VzrU26yDE9N7w(UnLox2(ZUiqfS29hcC3xpOFwiTnvWHmiP8oX(gmpTmizYuXn7IlsF7pxCr0xVF4)1hw8X)V')">Copy ozUI Colour Profile</button>
+                    <button class="copy-btn main-action elv-action" onclick="copyText('!E1!TZtAVTTX2(x59L(n7cUV4lWdqBowi2w(kj3M0GOekPrsSMIuxYr2Xbb5p27BVFzVZzgUmCzOKDvAlEOf4EJ8SEMZ(YmCM6SPZMS0J6n3lob)nDtmXJI)Ie6npGmB(mk87VSJe7tcxqWEwffsN4)vYSBvneg3K)ZEscTx02Dbekz5OWGNN1D2KN8xs3m7wtff(mNnzWx2ftssEY7zElJ2td8djZMm6(Pxp82bZMSH4VEdfwFlaIiFHEzu8waQMC3GX9gClacjBIE6AYJKayhG23efgfxfOJj72t9O(rH1b6JeqGX49v4Ktjvx8eyL3NayTzt6qJJw4tFgBEnjKe7fWWKruYwgonzN3c)W1Wod)Mbc6A4Gldsa2BpzcBzXj9LrRwLqaCGs1bMSWdGIBv(z43pxmkew3tJ6SybzhDy4JiqdOFVvpG0gSRXKDE(aa)M7hED)zt26h6V1BhdczlUMgSx(lIczaWs)vR8xSpaoyvaNYB6wp)GsJ4CdorBFmGjVb6vCkNBWM0IaVKKR8cyZm)azjSkQctsB2KDrj(ms5KPJUB8W3C1uCzOXElEarTtfgnd5s5Caj7JJjlOtI2hUeXgZHXVmoA3kVLKfrbCMgVzxARPyAB6AQQQAz5ABnB15M6Wcm7sdtnvnlfhfnDBxBxnShBGqlTN5Y6baOh9c2xSVWQ7aBQRHUUPLMQRoFKgSvxspZL1dS6brr0XrCCAO3wYLLzBe4c)p79cao2HahAMuukhDxV4Pz0UCg7mzydff((S2pCli44TMj3VEVFWYUEHpGB8cavtVSM4LF2wvgOk1CD9aL6U8cMVpflwEtnjhNr5fX(nrNSKsBTKsBTWniA(VdCA(psUmgW9Da5TR8xsgg(wYZj0OqMW4Uy)h9OqNXEjv1OmpIsJ2ENxiqoqb2LlJcrLPEX0TKqAHyQkipTbwAUQV6AY8cO3f9ejgiLSjLrxfjOYuHNsO1vCAALZxQEis8nXEl9riRBHcBnTYkSVTZndqL2WC3cCNByMzMNb3mCWUh39ve9uGo6MRqshhjmGK9ZLog1si)YdjQbgHNIIdwEWfKzllzBQgQ2xrsCCumEQXHwBazunJ8LnBOhbC2oMHVA(0asZ7C1zPYucr9cqDM5ZRDWavVppA5ZhEKlIIcwg9uyRybhriqkkRrah3I9GO023ee9eNZ(5aun1c0WW3)C39Gae8VSUz7Y673b(2qgd)p08IPGcLul0EbsuVCm6RkpJYR2ebeEzndxLkQyQyYWVrps4UEnnAxpqCIasxHupaHeFd2hZI3zdcE8(H35fdd4m8Vvo7CBqpWDeAhal1D00PJUHzwS0ifBhS8QFgyt7AYkAVnE00fNpKRhCztZK1mBwV5McGP2GZAt)SZnrZMD3dMIlgFD4kVXZ10So7CD0pHNyZQlbOE3W9m54wblht2k0nkjHZcKDOA4ab4nvtaVDnOmIrnoY9WvdoAwGYTFdei7m3pGPfTTTXfCfOpONNp2k7LumOLIc7WG9D5NUlW75CUa5B25QokNPboTm5ob7lvpznCS0nDbkGTw2(DzeiGvA7Qm1s8tM6oNzIUmMcSGHQNpAMktnZZm1n5tEi68Wrpv9Z0a5QjdEeAFAKxcTDXevMCsQbXJu0Y1n)urOhg)dEcCMUnq2(fYg)fbKjKkIxhqY0s18SmoyVWdcDQ6AmvpPHKbhR2hFo)0yp)L6Ve8SUv2uN6fV(iqfQ2oCorbgQEajAEjySkaAPWejtsqYtCuWb3gLZmnbEN)DrithNCSDk7q)Pm)S6feT4HJAMQGCIIRiEu9vGh709tQTFS0DZgOw(aRZUzyDMHlynsuzzdC2s1Yyy6a84QzBLrRm3GZUiZ5uUn7RiElpwLz6mwVoqBE40ebT2is6OcDd0osNcpzlZs0G62sehTxhXX8aeNCb8RjEpskBS5aI462AGAlNSDYQTDkfJ3Pseahh2dOSwabDujFooUPARJwdaXJU3oy6XrFzz15xgnS3GEx1z6b460DzmetXeJmfJCVITTd5)IP2z6ziq9JH4M6XJOgSYkJAHg4ACggUlaTrbu)DVeavhud6IZmE9gy76TjYFbzA061O3Qs5Gn1v4MaAwwPb6LMf47KHrHr01VmOKBgva50Gs(wDaWYfWrWjDm6rBnFkp4(ZKWjXvDeRS5bDdBCNaw6(K5Vq)kvDGd4lYzsMklwSmHWWP35TMKWZB06Ksz3qmVk(OjBEVP5wGNLL54)pnpNFw8iyIHTCXZzbipS3OB5HvmmCvK8SGK1BdHImDdedYgi2lm1aksdD5jV45EHl)1Iu5umYES4Qyr1pip0RdKBgW9RLSKa8mpDHeW8tqcpPea6sCF(99Hp0NKa2PJ94zLC)U1Xax(qapJPDGg7fMSJrmY2z8a3Rixni(Smwfud7fdEAfVyZOqWsEsDGwsgJQFwaeZdCmLMBz8D5LahN4bBlenqoPS71d)TFRZ4(5OA(kQRYtxDx)WLtFEhdkpusYUlpBNfAZWZSxwIJwYLfWFUjk2)ROX)Gjcz4tYoKYk6ip)zVtiPRSgEVqgzBpdBVkicugFBegOe78o)fTP1HyuO1FHKno9KQZZLW(qF6kuZdlvamnFJcVjAFcPpMeJUvts22OL(R8tJvFYvdbkYKUbGvSa)K8fKxdL0uHwQyeOR3Yroc0ZQGBArdgbhTymRFSCSjMM8LfswyEddxaBXDr(iIwG7rg(FxSparSOzZomNDhCkJc9colmkm73WiX8C9ednVmLEDNyw5XJ5gIxaiDmvAbdyzh8tRsfz(WsWw3h)q0QviH9JIP5pJLpz)wqkJPOyAE2VyPHowaPL2EJv2jhs0SfZS0kroIcqKPBznCqPB67J1oGbnmZdF6(7e4YpiDclEfFHEx6XrgnObAgBdzNYSAyubfWsN4oW)cYWWLalpTEbWcZyUlHYd9x8a2Z5bKqNpwPYkzyD8ukDDHi0izqtb(CP3wWAzCwT38w(8InKfpudSfq1mYyAkNrpMyvfAUxTnml7YymbnjHJcx(P7JhL6TyZ0OuAwZBSfxfWkm80kQtlYf(rlziGQBS8vNRwJgad)IGOW1YW)l9tqWG7qglHMaggIfyUhTcMFEMy3DXeajKvUtXE510DcpBP3ocvCUddRQ64wW9nMXCx4qa(NGsrUlcDtRIccofK(C)EMNAN(slBdltlhxhhnxtvlNI6PzAPAPzcX4zQyRPzMwPnA6IKV(iLKPViVKlQkyH5GzOuTeC16jwwpubgon0FBH6wi0dRcl11KvPKKLjP8XFb3)o6fGf)ykRCFF87F(BF77F(dG6Zn7(4pjsWlBCpdwmuAxlZXOejZJ2Qk2AwsbRP(GXL1tNvsyooJBFuMOcflM8YLbKEbGYfwsFqbizQUSKyPqe)AC6XVYfFq3QAqTtdYnC5cScPmmal7eF)ZttlKrkgf(leREf)ew68v(mXKcz89FK)7lGdXc449XsApA8It87aK4V65RY1Z18nPOwLum4e021yKjiGkLF1Q2aActHo7aEbNd6JF4BFBXQvxY(V)3)NV9na79FZ76ITa0SFRmnInQXkxKXqqKjC)wWQBc4MBvlY6gsLEAYjrrfIPN(P(BjmXduiIpuuC9)pRUepPVtG2J)DHFFzgzHi4OEDcxMxCnMR1tyndcID6923mE0932xa5K2jlGXm0lkiHBIy9KZyTgp4ModVD4TV5MoVRGf1j1NYEvrQmhd4Q9Enk(SkMNwf9Eh0ZVQEOl458po3ZlhgGup0)H4JLONvLCqT5OD(RXZ9)aEsF6Dhw0j4YyStEeucoylpykqP5BIJ2VduBA9hmihPrZiHhN(hjsfK0HfEuMiAzgkbN7tfj1BdERivR)sehRGu(IGftkpHq8Q7Ys5HezsUHXegHHDa5rfWCWIfuW8MIuqQp)TC5JYnK6EyP)s8(c48gUVqzmyfhFx9sYVALCPovF74ubQY3dYZlfc35sVtG10a0F0VE7NsPOTQdynIN7cW94rxpOr565sKqB3LOg8mveGBjwzQGFpHr0HHCFyzUZ1Sfx(FHwAKzawGABvbsNnjkm4z0Vvyl7kO7Gv7ZxQJGcsVQAO3GERE4OZ3qvfp2TyHmALFabKOx4VYFrAcOpGIGC42SftYjqigc8rDq3f6d(FiAa8Ur)k6arfnfkIkyqI4RtkoxfWbd)QrVJl02Hx3vPw81CKkFJRmxl1u5APAXZOAEGJgYl7OIecuUt8AvqLIHMutAUGUKsbpyaN)XdYmxowiAHcmpqyrmiNWIYTcWpTAmPTw)in2vNtsOQ5e4T(HDcaNzsVC2hBQFgtsAmY4MK5R7HbZcSu)Jeds7v5goEdqXjuSXPti3dD1kIgh0TL)oNd9d5H(XyJ(OZc6r4HUu76gv8q)VX(L)AtoTKSo8d0f9xVRWI(WB0MV(hVyYPPegT44jLzB8WsVsJCOKcUUJg3FW4jLufNIAvvmAmfxS2BKk3iHiJ8lp1z5pDjg778OKQfyO6PZOks3WOC4ch0hMZBwcdLTYF0hoVC)3ounkAj7yf2)etKZjnjrkhkXqAhxIH(ljJUA)aYOR45(4twAvUrlPSBszBkj6NfPpwiGPBaTrR3GGQGDVAm7nRrv9hBXwK7WlElu8QiZkIgZfPqZfGNjmZ1yKhmR5(hQySNkPVCsCozTbvvVgM7c(R)0zT)Iab)LuUcGkmn2p8bIWRKYuS4YAM)LurpbnKI6bZgEriHYykkFceKHnBRgHwvfYmvEvwuArgb44tQ(kHrzJgEvS8OAs4ibeJYeyy1bHXDYBCUqLseUnymow2y5OYpnxOIhXZU02sZ1sZ2sXqr10vrT4f8jPN5Y6jxAjDNebig7E1T20Yu1ewffnxBdBdwjtmzBTKEMlRhAkokft8mJjJB8eBqYgRblIJPHTwTnUApZL1tJcwEZtIINZOxEWenum0vDTTSnDb0MsrLPSDmunTuTvmu1SnmvlE6QwQgwkooUk6A6Mk6zZjlC2DzrdX3b2tVfqjgok62WSsxh8GAO7AzO6QO5yPR64i84yDTvDSTCvGJIgEt8Y2HlT1naiYbwlhlBvlT86LHx)tHJgU8QAQanW2uZY10XmROBm8OdwmoDtnxxDDDTYhGmLVvqBlxYeQ5NlPvUJV8n2ZC5v7JMgv4FcmI4fw(apr2x9ZFMBr9kqfwatngSf99tiqeEP8cw6kadJRRITJQPbyGDv6tBU3(4dpOB8w7V4qdc8tjjLIjFu0uxtZEPH0I8YnvinnN6hWnxZiZK2w8IiI8SzBAzfTf2Yo10iUsqgJMeDYPxH(kT2HNyQ0laCZ23R5yaL)XNGM5GsyepHyS7rswP(kBJQ5voBIxXUL3OkB899Wwt2J8b(bABLhGcycEYZjuYwrNDGjtdiyjacxYjbPxCC(lYwKcK)wYtZDw2TFVpCuQpAAXtUu2aOvURPOfwMILuNhG)rVjd9SqxZUVp8WZNZEukIPYzR3IyjxS8nr0hW7VCvCCr7fPZPOTgU(08nLnwd5UxWhwcl3kfGv1RdCbpx(YuFhZNDbaMlXGtLdTORTIxDHIwFVO3qSfRuRa89OFIF278e80JY5pax)WNE))67FgRGx(r6os8yE4nug1YPjQL(rslKCnNRJRAb)0ofS8YiHs0mkSrCvduJMr1uXmTokSx2lgVRm5Aax6(p4sz4sa7OkrVaNXm7TMJVQHMezAbfYM5n7dqq9NDX)RD8Atyjj4AziVC9doYvpiOPbF9WTq2W6cctd0I(V5FTtQQvUUQYMjt7a3k4FIzUB8WbtMYdT(GknAHUTk45O0Amayfi0yvhiW4pKAgyVp2If2YUOKec7oTK308OqwHcUWeBs9FnBYV2z84HJgFAx0jx15Mo3EAxZB68MbN2vmlUIt6A256o9hEQp6JU9TN2veO6xpQ3jEr7paa0RUNFPYoLl8pI1S)47h2)0UKd(LrV9udMJh9M7pTS90wnjx33StRhm1IFOsg)epayU(WJq5ZEwRIN(02yFEoB04p3cIXrAb5K4G6l155JWQHwlEPwKB82iV5bAIfL9Gu2w9y6ii2hH7QnepjLFRn2f4rjSsjK)fE4UR78EqaB6l7(y34iXISZVDWsViJnDXIXMZRiyLE4xC8n(HDJIxsY(GRY(G38PoSlRdobAeDqH3u8kCXk3ETwfAyhoMY8O8liETjHvj6DC5wc99aza)mBb)CmbqN4hQ1sxSw(IuD73vAVzVw)g3NMxZI(RcYf98(0xscB7XgQUFLBdX6Bs)8OVncDzL)ovyqZ86cdPnwiGhSAD(milH4KJ(sX9)Tt3r)YGpHFiT(0WBNmS)G0YyLNfxwCCylSVbnJtB1YjJ6ZRb2yYo8t4E6omp6lx5NaCvpZHct(riTTuiFcjGSa58sVJ4nNm(9jKUt9wFlEtM6YU6LrynrgIFZsF0lGjufUFBNGaGoUSeWWk5tk2O(cJ3EDS(y8VrwmKJWbp9CQRR3u4JHrSVHuIpngC5ML(QhM6np52OUckLyRCV)8)2Fd6LEcKhtMn5NU5943f5FsKycNpx2lcGY)EJXcSJ9HaRzugnvLXQi8mT9zqCFrxcikSN9r0bTdDdQ9f)d8IqJ)RxaGXsaDKpnM4fSLvNS8TiLh1Cw63VzrU26yDE9N7w(UnLox2(ZUiqfS29hcC3xpOFwiTnvWHmiP8oX(gmpTmizYuXn7IlsF7pxCr0xVF4)1hw8X)V')">Copy ozUI Colour Profile</button>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="bcdm" class="section-container">
+        <div class="featured-grid">
+            <div class="featured-card" style="border-color: var(--bcdm);">
+                <div class="featured-header">
+                    <span class="badge bcdm-badge">BCDM</span>
+                    <h2>BetterCooldownManager</h2>
+                </div>
+                <div class="featured-footer">
+                    <p>Dynamic sorting and grouping for all major class cooldowns. Requires the BetterCooldownManager addon.</p>
+                    <button class="copy-btn main-action" style="border-color: var(--bcdm) !important; color: var(--bcdm) !important;" onclick="copyText('BCDM_STRING_HERE_REPLACE_ME')">Copy BCDM String</button>
+                </div>
+            </div>
         </div>
-
-    <div id="other" class="section-container">
-        <p style="text-align:center; color:#555; margin-top:20px;">Other profiles coming soon...</p>
     </div>
 
     <div id="toast">Copied to Clipboard!</div>
@@ -187,6 +235,10 @@
         }
 
         function copyText(text) {
+            if(text.includes("_STRING")) {
+                alert("This is a placeholder. Please replace with your actual import string in the HTML code.");
+                return;
+            }
             navigator.clipboard.writeText(text).then(() => {
                 const toast = document.getElementById("toast");
                 toast.className = "show";
